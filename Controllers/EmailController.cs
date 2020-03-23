@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using EmailService.Services;
+using EmailService.Services.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace EmailService.Controllers
 {
@@ -11,28 +10,51 @@ namespace EmailService.Controllers
     [Route("[controller]")]
     public class EmailController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly IEmailService emailService;
 
-        //private readonly ILogger<WeatherForecastController> _logger;
-
-        public EmailController()
+        public EmailController(IEmailService emailService)
         {
+            this.emailService = emailService;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [Route("GetDetails")]
+        public async Task<IActionResult> GetDetailsAsync(int id)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            EmailDtoExtended details = await emailService.GetDetails(id);
+            return Ok(details);
+        }
+
+        [HttpGet]
+        [Route("Page")]
+        public async Task<IActionResult> Page(int pageIndex, int itemPerPage)
+        {
+            PageDto<EmailDto> result = await emailService.GetPageAsync(pageIndex, itemPerPage);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            List<EmailDto> result = await emailService.GetAllAsync();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("SendPending")]
+        public async Task<IActionResult> SendPending()
+        {
+            await emailService.Send();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("Create")]
+        public async Task<IActionResult> CreateAsync(EmailDto emailDto)
+        {
+            await emailService.Create(emailDto);
+            return StatusCode(201);
         }
     }
 }

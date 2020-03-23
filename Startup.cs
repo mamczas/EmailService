@@ -22,6 +22,7 @@ namespace EmailService
         {
             services.AddControllers();
             services.AddDbContext<Context.EmailServiceDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.AddSwagger();
         }
 

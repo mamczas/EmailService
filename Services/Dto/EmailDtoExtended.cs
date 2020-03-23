@@ -1,18 +1,15 @@
 ﻿using EmailService.Enums;
 using System;
-using System.ComponentModel.DataAnnotations;
 
-namespace EmailService.Context.Models
+namespace EmailService.Services.Dto
 {
-    public class EmailModel : IDataEntity
+    public class EmailDtoExtended
     {
         public int Id { get; set; }
-        [EmailAddress]
         public string Sender { get; set; }
         public string Subject { get; set; }
         public string Recipients { get; set; }
-        public string Text { get; set; }
-        public string Html { get; set; }
+        public string Message { get; set; }
         public StatusEnum Status { get; set; }
         public DateTime Created { get; set; }
     }
